@@ -1,0 +1,133 @@
+buildscript {
+    ext {
+        springBootVersion = '1.4.0.RELEASE'
+    }
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+    }
+}
+
+apply plugin: 'java'
+apply plugin: 'java-library-distribution'
+apply plugin: 'eclipse'
+apply plugin: 'spring-boot'
+
+distributions {
+    main{
+        baseName = 'javafx-clock'
+    }
+}
+
+if (!hasProperty('mainClass')) {
+    ext.mainClass = 'ca.vasigorc.clock.Application'
+}
+
+task wrapper(type: Wrapper){
+    gradleVersion='2.14'
+}
+
+jar {
+    baseName = 'javafx-clock'
+}
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+
+dependencies {
+    compile('org.springframework.boot:spring-boot-starter')
+    compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.5'
+    compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.5'
+    runtime group: 'org.apache.logging.log4j', name: 'log4j-jcl', version: '2.5'
+    compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.4'
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+    testCompile('org.springframework.boot:spring-boot-starter-test')
+}
+
+
+eclipse {
+    classpath {
+        containers.remove('org.eclipse.jdt.launching.JRE_CONTAINER')
+        containers 'org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8'
+    }
+}
+
+ext.versionFile = file('version.properties')
+
+task loadVersion {
+    project.version = readVersion()
+}
+
+ProjectVersion readVersion(){
+    if(!versionFile.exists()){
+        throw new GradleException("Required version file does not exist:\n\
+$versionFile.canonicalPath")
+    }
+    
+    Properties versionProps = new Properties()
+    
+    versionFile.withInputStream {
+        stream -> versionProps.load(stream)
+    }
+    
+    new ProjectVersion(versionProps.major.toInteger(), versionProps.minor.toInteger(),
+        versionProps.release.toBoolean())
+}
+
+class ProjectVersion {
+    Integer major
+    Integer minor
+    Boolean release
+    
+    ProjectVersion(Integer major, Integer minor){
+        this.major=major
+        this.minor=minor
+        this.release=Boolean.FALSE
+    }
+    
+    ProjectVersion(Integer major, Integer minor, Boolean release){
+        this.major=major
+        this.minor=minor
+        this.release=release
+    }
+    
+    @Override
+    String toString(){
+        "$major.$minor${release ? '' : '-SNAPSHOT'}"
+    }
+}
+
+task printVersion << {
+    logger.quiet "Version: $version"
+}
+
+task incrementMajorVersion(group: 'versioning', description: 'Increments project \n\
+major version.') << {
+    String currentVersion = version.toString()
+    ++version.major
+    String newVersion = version.toString()
+    logger.info "Increment major project version: $currentVersion -> $newVersion"
+    
+    ant.propertyfile(file: versionFile) {
+        entry(key: 'major', type: 'int', operation: '+', value: 1)
+    }
+}
+
+task incrementMinorVersion(group: 'versioning', description: 'Increments project \n\
+minor version.') << {
+    String currentVersion = version.toString()
+    ++version.minor
+    String newVersion = version.toString()
+    logger.info "Increment minor project version: $currentVersion -> $newVersion"
+    
+    ant.propertyfile(file: versionFile) {
+        entry(key: 'minor', type: 'int', operation: '+', value: 1)
+    }
+}
