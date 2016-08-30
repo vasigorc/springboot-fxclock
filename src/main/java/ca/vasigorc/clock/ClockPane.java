@@ -16,7 +16,7 @@ import org.springframework.stereotype.Component;
 
 /**
  *
- * @author vgorcinschi
+ * @author daniel liang
  */
 @Component
 public class ClockPane extends Pane {
@@ -128,8 +128,8 @@ public class ClockPane extends Pane {
 
         //Draw hour hand
         double hLength = clockRadius * 0.5;
-        double hourX = centerX + hLength * Math.sin(hour % 12 + minute / 60.0) * (2 * Math.PI / 60);
-        double hourY = centerY - hLength * Math.cos(hour % 12 + minute / 60.0) * (2 * Math.PI / 60);
+        double hourX = centerX + hLength * Math.sin((hour % 12 + minute / 60.0) * (2 * Math.PI / 60));
+        double hourY = centerY - hLength * Math.cos((hour % 12 + minute / 60.0) * (2 * Math.PI / 60));
         Line hLine = new Line(centerX, centerY, hourX, hourY);
         mLine.setStroke(Color.GREEN);
         
