@@ -5,6 +5,7 @@
  */
 package ca.vasigorc.clock;
 
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import javafx.scene.layout.Pane;
@@ -107,10 +108,36 @@ public class ClockPane extends Pane {
         Circle circle = new Circle(centerX, centerY, clockRadius);
         circle.setFill(Color.WHITE);
         circle.setStroke(Color.BLACK);
-        Text t1 = new Text(centerX - 5, centerY - clockRadius + 12, "12");
-        Text t2 = new Text(centerX - clockRadius + 3, centerY + 5, "9");
-        Text t3 = new Text(centerX + clockRadius - 10, centerY + 3, "3");
-        Text t4 = new Text(centerX - 3, centerY + clockRadius - 3, "6");
+        Text t1 = new Text(centerX-7, centerY - clockRadius +25, "12");
+        Text t2 = new Text(centerX - clockRadius + 15, centerY + 5, "9");
+        Text t3 = new Text(centerX + clockRadius - 22, centerY + 5, "3");
+        Text t4 = new Text(centerX-5, centerY + clockRadius - 14, "6");
+        Text t5 = new Text(centerX + 36, centerY - clockRadius + 34, "1");
+        Text t6 = new Text(centerX + clockRadius - 34, centerY -34, "2");
+        Text t7 = new Text(centerX + clockRadius - 34, centerY +44, "4");
+        Text t8 = new Text(centerX + 36, centerY + clockRadius - 25, "5");
+        Text t9 = new Text(centerX -44, centerY + clockRadius - 25, "7");
+        Text t10 = new Text(centerX - clockRadius + 26, centerY +44, "8");
+        Text t11 = new Text(centerX - clockRadius + 26, centerY -34, "10");
+        Text t12 = new Text(centerX -43, centerY - clockRadius + 36, "11");
+        //Draw clock hashes
+        Line[] clockHashes = new Line[60];//60 minutes
+
+        for (int i = 0; i < 60; i++) {
+            double hashL;
+            if (i % 5 == 0) {
+                hashL = clockRadius * 0.12;
+            } else {
+                hashL = clockRadius * 0.07;
+            }
+            double startX = centerX + (clockRadius - hashL) * Math.sin(i * (2 * Math.PI / 60));
+            double startY = centerY - (clockRadius - hashL) * Math.cos(i * (2 * Math.PI / 60));
+            double endX = centerX + clockRadius * Math.sin(i * (2 * Math.PI / 60));
+            double endY = centerY - clockRadius * Math.cos(i * (2 * Math.PI / 60));
+            Line hashLine = new Line(startX, startY, endX, endY);
+            hashLine.setStroke(Color.BLACK);
+            clockHashes[i] = hashLine;
+        }
 
         //Draw seconds hand
         double sLength = clockRadius * 0.8;
@@ -128,12 +155,14 @@ public class ClockPane extends Pane {
 
         //Draw hour hand
         double hLength = clockRadius * 0.5;
-        double hourX = centerX + hLength * Math.sin((hour % 12 + minute / 60.0) * (2 * Math.PI / 60));
-        double hourY = centerY - hLength * Math.cos((hour % 12 + minute / 60.0) * (2 * Math.PI / 60));
+        double hourX = centerX + hLength * Math.sin((hour % 12 + minute / 60.0) * (2 * Math.PI / 12));
+        double hourY = centerY - hLength * Math.cos((hour % 12 + minute / 60.0) * (2 * Math.PI / 12));
         Line hLine = new Line(centerX, centerY, hourX, hourY);
         mLine.setStroke(Color.GREEN);
-        
+
         getChildren().clear();
-        getChildren().addAll(circle, t1, t2, t3, t4, sLine, mLine, hLine);
+        getChildren().addAll(circle, t1, t2, t3, t4, t5, t6, t7, 
+                t8, t9, t10, t11, t12, sLine, mLine, hLine);
+        getChildren().addAll(Arrays.asList(clockHashes));
     }
 }
